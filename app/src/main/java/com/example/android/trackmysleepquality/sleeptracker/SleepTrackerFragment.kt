@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright 2018, The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,12 +25,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepTrackerBinding
 import com.google.android.material.snackbar.Snackbar
 
-class SleepTrackerFragment : Fragment() {
+    class SleepTrackerFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -68,12 +69,38 @@ class SleepTrackerFragment : Fragment() {
             }
         })
 
-        val adapter = SleepNightAdapter()
+        /*
+        Recycler view
+         */
+
+        val manager = GridLayoutManager(activity, 3)
+        manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int) =  when (position) {
+                0 -> 3
+                else -> 1
+            }
+        }
+        binding.sleepList.layoutManager = manager
+
+        val adapter = SleepNightAdapter(SleepClickListener {
+            nightId ->
+            sleepTrackerViewModel.onSleepNightClicked(nightId)
+        })
 
         binding.sleepList.adapter = adapter
 
         sleepTrackerViewModel.nights.observe(viewLifecycleOwner , Observer {
-            adapter.submitList(it)
+            adapter.updateDataItems(it)
+        })
+
+        /****/
+
+        sleepTrackerViewModel.navigateToSleepDataQuality.observe(viewLifecycleOwner, Observer {night ->
+            night?.let {
+                sleepTrackerViewModel.onSleepDataQualityNavigated()
+                this.findNavController().navigate(SleepTrackerFragmentDirections
+                        .actionSleepTrackerFragmentToSleepDetailFragment(night))
+            }
         })
 
         // Add an Observer on the state variable for Navigating when STOP button is pressed.
