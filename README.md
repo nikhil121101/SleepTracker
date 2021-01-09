@@ -4,6 +4,5 @@
 
 ## Screenshots
 
-![Screenshot1](screenshots/Screenshot_1.png)
-![Screenshot2](screenshots/Screenshot_2.png)
+<img src="screenshots/Screenshot_1.png" width="425"/> <img src="screenshots/Screenshot_2.png" width="425"/>
 
